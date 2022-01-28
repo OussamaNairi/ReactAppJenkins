@@ -13,7 +13,7 @@ node {
 
     stage('Build image') {
 
-       app = docker.build("radhouenassakra/docker-angular", "./docker-compose/angular-app/")
+       app = docker.build("oussamanairi/reactapp", ".")
     }
 
     stage('Test image') {
@@ -26,7 +26,7 @@ node {
 
     stage('Push image') {
 
-        docker.withRegistry('https://registry.hub.docker.com', 'git') {
+        docker.withRegistry('https://registry.hub.docker.com', 'dockercredentials') {
             app.push("${env.BUILD_NUMBER}")
             app.push("latest")
         }
