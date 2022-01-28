@@ -1,37 +1,36 @@
-// Build a dockerimage and push it to dockerhub
-// Code Quality with SonarQube
-// Launch the pipeline every Commit using ngrok
-
-node {
-    def app
+pipeline {
+  agent any
+    
+  tools {nodejs "node14"}
+    
+  stages {
+        
 
     stage('Clone repository') {
 
 
         checkout scm
     }
-
-    stage('Build image') {
-
-       app = docker.build("oussamanairi/reactapp", ".")
+     
+    stage('Build') {
+      steps {
+        sh 'npm install'
+         sh 'npm run build'
+      }
+    }  
+    
+            
+    stage('Test') {
+      steps {
+        sh 'echo "hello world"'
+      }
     }
 
-    stage('Test image') {
 
-
-        app.inside {
-            sh 'echo "Tests passed"'
+  }
+      post {
+        always {
+            archiveArtifacts artifacts: 'build', onlyIfSuccessful: true
         }
-    }
-
-    stage('Push image') {
-
-        docker.withRegistry('https://registry.hub.docker.com', 'dockercredentials') {
-            app.push("${env.BUILD_NUMBER}")
-            app.push("latest")
-        }
-    }
-    stage (" Archieve Artifact") {
-        archiveArtifacts artifacts: "${app}" , fingerprint: true
     }
 }
